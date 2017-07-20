@@ -1,0 +1,6 @@
+---
+# defaults file for oss-docker-config
+
+docker_opts: []
+docker_insecure_registries: []
+docker_registry_mirrors: []

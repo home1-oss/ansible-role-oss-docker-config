@@ -1,0 +1,12 @@
+---
+
+#docker_insecure_registries: ["172.22.101.10:25000", "172.22.101.10:25001", "172.22.101.10:25004"]
+#docker_registry_mirrors: ["--registry-mirror=http://172.22.101.10:25001"]
+
+docker_insecure_registries:
+- 172.22.101.10:25000
+- 172.22.101.10:25001
+- 172.22.101.10:25004
+
+docker_registry_mirrors:
+- http://172.22.101.10:25001

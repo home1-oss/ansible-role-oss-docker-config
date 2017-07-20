@@ -1,0 +1,71 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+INIT_SH_PATH = File.join(File.dirname(__FILE__), "vagrant_assets/init.sh")
+
+Vagrant.configure(2) do |config|
+
+  config.ssh.insert_key = false
+
+  config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'" # avoids 'stdin: is not a tty' error.
+  config.ssh.private_key_path = ["#{ENV['HOME']}/.vagrant.d/insecure_private_key","#{ENV['HOME']}/.ssh/id_rsa"]
+
+  config.vm.provision "shell", inline: <<-SCRIPT
+    mkdir -p /root/.ssh
+    curl https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant.pub > /root/.ssh/authorized_keys
+    printf "%s\n" "#{File.read("#{ENV['HOME']}/.ssh/id_rsa.pub")}" >> /root/.ssh/authorized_keys
+    chmod 600 /root/.ssh/authorized_keys
+    chown -R root:root /root/.ssh
+  SCRIPT
+
+  if File.exist?(INIT_SH_PATH)
+    config.vm.provision :file, :source => "#{INIT_SH_PATH}", :destination => "/tmp/init.sh"
+    config.vm.provision :shell, :inline => "/tmp/init.sh", :privileged => true
+  end
+
+  config.vm.define "dockertrusty64" do |dockertrusty64|
+    dockertrusty64.vm.hostname = 'dockertrusty64'
+    dockertrusty64.vm.box= "ubuntu/trusty64"
+    dockertrusty64.vm.box_url = "ubuntu/trusty64"
+
+    dockertrusty64.vm.network :private_network, ip: "172.22.101.61", nic_type: "82545EM"
+
+    dockertrusty64.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--memory", 1024]
+      v.customize ["modifyvm", :id, "--name", "dockertrusty64"]
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+    end
+  end
+
+  config.vm.define "dockerxenial64" do |dockerxenial64|
+    dockerxenial64.vm.hostname = 'dockerxenial64'
+    dockerxenial64.vm.box= "ubuntu/xenial64"
+    dockerxenial64.vm.box_url = "ubuntu/xenial64"
+
+    dockerxenial64.vm.network :private_network, ip: "172.22.101.62", nic_type: "82545EM"
+
+    dockerxenial64.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--memory", 1024]
+      v.customize ["modifyvm", :id, "--name", "dockerxenial64"]
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+    end
+  end
+
+  config.vm.define "dockercentos7" do |dockercentos7|
+    dockercentos7.vm.hostname = 'dockercentos7'
+    dockercentos7.vm.box= "centos/7"
+    dockercentos7.vm.box_url = "centos/7"
+
+    dockercentos7.vm.network :private_network, ip: "172.22.101.63", nic_type: "82545EM"
+
+    dockercentos7.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--memory", 1024]
+      v.customize ["modifyvm", :id, "--name", "dockercentos7"]
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+    end
+  end
+
+end

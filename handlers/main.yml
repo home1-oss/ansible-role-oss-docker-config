@@ -1,0 +1,4 @@
+---
+# handlers file for oss-docker-config
+- name: restart docker
+  action: service name=docker state=restarted

@@ -1,0 +1,15 @@
+#localhost
+
+[hosts:children]
+dockertrusty64
+dockerxenial64
+dockercentos7
+
+[dockertrusty64]
+dockertrusty64 ansible_ssh_port=22 ansible_ssh_host=172.22.101.61
+
+[dockerxenial64]
+dockerxenial64 ansible_ssh_port=22 ansible_ssh_host=172.22.101.62
+
+[dockercentos7]
+dockercentos7 ansible_ssh_port=22 ansible_ssh_host=172.22.101.63

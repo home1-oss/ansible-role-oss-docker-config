@@ -1,0 +1,6 @@
+{% if users is defined and users %}
+{% for user in users %}
+{{ user }}{% if not loop.last %},
+{% endif %}
+{% endfor %}
+{% endif %}

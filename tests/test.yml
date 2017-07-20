@@ -1,0 +1,29 @@
+---
+#- hosts: localhost
+#  remote_user: root
+#  roles:
+#    - oss-docker-config
+
+- hosts: all
+  remote_user: root
+  roles:
+    - oss-docker-config
+
+---
+- name: Installing and configuring Docker
+  hosts: all
+  sudo: yes
+  roles:
+    - { role: home1-oss.oss-docker-install, tags: ["docker"] }
+
+#- name: Installing and configuring Docker
+#  hosts: all
+#  sudo: yes
+#  roles:
+#    - { role: oss-docker-install, tags: ["docker"] }
+
+- name: Docker config
+  hosts: all
+  sudo: yes
+  roles:
+    - { role: oss-docker-config, tags: ["docker-config"] }

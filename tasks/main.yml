@@ -1,0 +1,88 @@
+---
+# tasks file for oss-docker-config
+- stat:
+    path: /etc/default/docker
+  register: etc_default_docker
+
+- stat:
+    path: /usr/lib/systemd/system/docker.service
+  register: usr_lib_systemd_system_docker_service
+
+- name: Test is systemctl present
+  shell: if type -p systemctl > /dev/null || [ -f /bin/systemctl ]; then printf yes; else printf no; exit 1; fi
+  ignore_errors: yes
+  register: test_systemctl_present
+  sudo: no # sudo: yes cause always False
+
+- set_fact: is_systemctl_present="{{ test_systemctl_present.stdout | bool }}"
+
+- debug: msg="is_systemctl_present {{ is_systemctl_present }}"
+
+- name: ensure /etc/default/docker exists
+  copy:
+    content: ""
+    dest: /etc/default/docker
+    force: no
+    owner: root
+    group: root
+    mode: 0644
+  sudo: yes
+  when: (not is_systemctl_present) and (not etc_default_docker.stat.exists)
+- stat:
+    path: /etc/default/docker
+  register: etc_default_docker
+
+- name: ensure /etc/docker/daemon.json exists
+  copy:
+    content: "{}"
+    dest: /etc/docker/daemon.json
+    force: no
+    owner: root
+    group: root
+    mode: 0644
+  sudo: yes
+  when: is_systemctl_present
+- stat:
+    path: /etc/docker/daemon.json
+  register: etc_docker_daemon_json
+
+# Check for the variable “docker_opts” which is not defined by default,
+# and if it is defined will add the options defined in the variable to the file:
+- name: Docker Upstart and SysVinit configure
+  template:
+      src=etc_default_docker.j2
+      dest=/etc/default/docker
+      mode=0644
+      owner=root
+      group=root
+  sudo: yes
+  notify: restart docker
+  when: (not is_systemctl_present) and etc_default_docker.stat.exists
+
+- name: Docker daemon.json configure
+  template:
+      src=etc_docker_daemon_json.j2
+      dest=/etc/docker/daemon.json
+      mode=0644
+      owner=root
+      group=root
+  register: daemon_json
+  sudo: yes
+  when: is_systemctl_present and etc_docker_daemon_json.stat.exists
+
+- name: Docker Systemd configure at /usr/lib/systemd/system/docker.service
+  template:
+      src=usr_lib_systemd_system_docker_service.j2
+      dest=/usr/lib/systemd/system/docker.service
+      mode=0644
+      owner=root
+      group=root
+  register: docker_service
+  sudo: yes
+  when: is_systemctl_present and usr_lib_systemd_system_docker_service.stat.exists
+
+- name: systemctl daemon-reload on docker.service changed
+  shell: systemctl daemon-reload
+  sudo: yes
+  notify: restart docker
+  when: is_systemctl_present and (docker_service.changed or daemon_json.changed)
