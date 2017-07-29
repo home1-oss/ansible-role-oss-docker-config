@@ -71,6 +71,15 @@
   sudo: yes
   when: is_systemctl_present and etc_docker_daemon_json.stat.exists
 
+- name: Creates /etc/systemd/system/docker.service.d directory
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0775
+  when: is_systemctl_present
+
 - name: Docker Systemd configure at /etc/systemd/system/docker.service.d/http-proxy.conf
   template:
       src=etc_systemd_system_docker.service.d_http-proxy.conf.j2
