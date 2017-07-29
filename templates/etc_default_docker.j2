@@ -12,10 +12,23 @@
 
 # Use DOCKER_OPTS to modify the daemon startup options.
 #DOCKER_OPTS="--dns 8.8.8.8 --dns 8.8.4.4"
+{% if not is_systemctl_present %}
 DOCKER_OPTS="{{ docker_opts | join(' ')}} {{ '--insecure-registry ' + ' --insecure-registry '.join(docker_insecure_registries) }} {{ '--registry-mirror=' + ' --registry-mirror='.join(docker_registry_mirrors) }}"
+{% endif %}
 
 # If you need Docker to use an HTTP proxy, it can also be specified here.
 #export http_proxy="http://127.0.0.1:3128/"
+
+export no_proxy='localhost,127.0.0.0/8'
+export NO_PROXY='localhost,127.0.0.0/8'
+{% if http_proxy is defined and http_proxy %}
+export http_proxy={{ http_proxy }}
+export HTTP_PROXY={{ http_proxy }}
+{% endif %}
+{% if https_proxy is defined and https_proxy %}
+export https_proxy={{ https_proxy }}
+export HTTPS_PROXY={{ https_proxy }}
+{% endif %}
 
 # This is also a handy place to tweak where Docker's temporary files go.
 #export TMPDIR="/mnt/bigdrive/docker-tmp"

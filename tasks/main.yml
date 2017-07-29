@@ -57,7 +57,8 @@
       group=root
   sudo: yes
   notify: restart docker
-  when: (not is_systemctl_present) and etc_default_docker.stat.exists
+  #when: (not is_systemctl_present) and etc_default_docker.stat.exists
+  when: etc_default_docker.stat.exists
 
 - name: Docker daemon.json configure
   template:
