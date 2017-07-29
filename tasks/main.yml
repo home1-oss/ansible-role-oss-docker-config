@@ -87,7 +87,7 @@
       mode=0644
       owner=root
       group=root
-  register: docker_service
+  register: docker_proxy
   sudo: yes
   when: is_systemctl_present
 
@@ -106,4 +106,4 @@
   shell: systemctl daemon-reload
   sudo: yes
   notify: restart docker
-  when: is_systemctl_present and (docker_service.changed or daemon_json.changed)
+  when: is_systemctl_present and (daemon_json.changed or docker_proxy.changed or docker_service.changed)
