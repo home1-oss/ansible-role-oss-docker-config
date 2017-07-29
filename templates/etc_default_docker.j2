@@ -19,8 +19,8 @@ DOCKER_OPTS="{{ docker_opts | join(' ')}} {{ '--insecure-registry ' + ' --insecu
 # If you need Docker to use an HTTP proxy, it can also be specified here.
 #export http_proxy="http://127.0.0.1:3128/"
 
-export no_proxy="localhost,127.0.0.0/8{% if docker_insecure_registries is defined and docker_insecure_registries %}{% for registry in docker_insecure_registries %},{{ registry.split(':')[-1] }}{% endfor %}{% endif %}"
-export NO_PROXY="localhost,127.0.0.0/8{% if docker_insecure_registries is defined and docker_insecure_registries %}{% for registry in docker_insecure_registries %},{{ registry.split(':')[-1] }}{% endfor %}{% endif %}"
+export no_proxy="localhost,127.0.0.0/8{% if docker_insecure_registries is defined and docker_insecure_registries %}{% for registry in docker_insecure_registries %},{{ registry.split(':')[0] }}{% endfor %}{% endif %}"
+export NO_PROXY="localhost,127.0.0.0/8{% if docker_insecure_registries is defined and docker_insecure_registries %}{% for registry in docker_insecure_registries %},{{ registry.split(':')[0] }}{% endfor %}{% endif %}"
 {% if http_proxy is defined and http_proxy %}
 export http_proxy={{ http_proxy }}
 export HTTP_PROXY={{ http_proxy }}
