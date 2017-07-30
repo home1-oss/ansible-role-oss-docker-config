@@ -6,7 +6,9 @@ if type -p lsb_release > /dev/null; then
     if [ "${id}" == "Ubuntu" ]; then
         sudo sed -i 's#http://archive.ubuntu.com/ubuntu#http://mirrors.163.com/ubuntu#g' /etc/apt/sources.list
         sudo sed -i 's#http://security.ubuntu.com/ubuntu#http://mirrors.163.com/ubuntu#g' /etc/apt/sources.list
+        sudo apt-get update --fix-missing
         sudo rm -vrf /var/lib/apt/lists/*
+        sudo mkdir /var/lib/apt/lists/partial
         sudo apt-get clean -y
 
         if [ "${codename}" == "xenial" ]; then
