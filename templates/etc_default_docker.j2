@@ -13,7 +13,7 @@
 # Use DOCKER_OPTS to modify the daemon startup options.
 #DOCKER_OPTS="--dns 8.8.8.8 --dns 8.8.4.4"
 {% if not is_systemctl_present %}
-DOCKER_OPTS="{{ docker_opts | join(' ')}}{% if docker_insecure_registries is defined and docker_insecure_registries %} {{ '--insecure-registry ' + ' --insecure-registry '.join(docker_insecure_registries) }}{% endif %}{% if docker_registry_mirrors is defined and docker_registry_mirrors %} {{ '--registry-mirror=' + ' --registry-mirror='.join(docker_registry_mirrors) }}{% endif %}"
+DOCKER_OPTS="{% if docker_opts is defined and docker_opts %}{{ docker_opts | join(' ')}}{% endif %}{% if docker_insecure_registries is defined and docker_insecure_registries %} {{ '--insecure-registry ' + ' --insecure-registry '.join(docker_insecure_registries) }}{% endif %}{% if docker_registry_mirrors is defined and docker_registry_mirrors %} {{ '--registry-mirror=' + ' --registry-mirror='.join(docker_registry_mirrors) }}{% endif %}"
 {% endif %}
 
 # If you need Docker to use an HTTP proxy, it can also be specified here.
