@@ -1,8 +1,8 @@
 ---
 
 docker_insecure_registries:
-- registry.docker.internal:80
-- mirror.docker.internal:80
+- registry.docker.internal
+- mirror.docker.internal
 - gcr.io.internal:25004
 
 docker_registry_mirrors:
