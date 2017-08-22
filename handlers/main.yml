@@ -2,3 +2,6 @@
 # handlers file for oss-docker-config
 - name: restart docker
   action: service name=docker state=restarted
+  become: yes
+  become_user: root
+  become_method: sudo

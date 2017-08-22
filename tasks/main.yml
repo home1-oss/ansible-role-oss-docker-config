@@ -26,11 +26,16 @@
     owner: root
     group: root
     mode: 0644
-  sudo: yes
   when: (not is_systemctl_present) and (not etc_default_docker.stat.exists)
+  become: yes
+  become_user: root
+  become_method: sudo
 - stat:
     path: /etc/default/docker
   register: etc_default_docker
+  become: yes
+  become_user: root
+  become_method: sudo
 
 - name: ensure /etc/docker/daemon.json exists
   copy:
@@ -40,11 +45,16 @@
     owner: root
     group: root
     mode: 0644
-  sudo: yes
   when: is_systemctl_present
+  become: yes
+  become_user: root
+  become_method: sudo
 - stat:
     path: /etc/docker/daemon.json
   register: etc_docker_daemon_json
+  become: yes
+  become_user: root
+  become_method: sudo
 
 # Check for the variable “docker_opts” which is not defined by default,
 # and if it is defined will add the options defined in the variable to the file:
@@ -55,10 +65,12 @@
       mode=0644
       owner=root
       group=root
-  sudo: yes
   notify: restart docker
   #when: etc_default_docker.stat.exists
   when: (not is_systemctl_present) and etc_default_docker.stat.exists
+  become: yes
+  become_user: root
+  become_method: sudo
 
 - name: Docker daemon.json configure
   template:
@@ -68,8 +80,10 @@
       owner=root
       group=root
   register: daemon_json
-  sudo: yes
   when: is_systemctl_present and etc_docker_daemon_json.stat.exists
+  become: yes
+  become_user: root
+  become_method: sudo
 
 - name: Creates /etc/systemd/system/docker.service.d directory
   file:
@@ -79,6 +93,9 @@
     group: root
     mode: 0775
   when: is_systemctl_present
+  become: yes
+  become_user: root
+  become_method: sudo
 
 - name: Docker Systemd configure at /etc/systemd/system/docker.service.d/http-proxy.conf
   template:
@@ -88,8 +105,10 @@
       owner=root
       group=root
   register: docker_proxy
-  sudo: yes
   when: is_systemctl_present
+  become: yes
+  become_user: root
+  become_method: sudo
 
 - name: Docker Systemd configure at /usr/lib/systemd/system/docker.service
   template:
@@ -99,11 +118,15 @@
       owner=root
       group=root
   register: docker_service
-  sudo: yes
   when: is_systemctl_present and usr_lib_systemd_system_docker_service.stat.exists
+  become: yes
+  become_user: root
+  become_method: sudo
 
 - name: systemctl daemon-reload on docker.service changed
   shell: systemctl daemon-reload
-  sudo: yes
   notify: restart docker
   when: is_systemctl_present and (daemon_json.changed or docker_proxy.changed or docker_service.changed)
+  become: yes
+  become_user: root
+  become_method: sudo
